@@ -1,17 +1,20 @@
 #!/usr/bin/env node
+import 'source-map-support/register';
+import * as cdk from 'aws-cdk-lib';
+import { FormsNexusApisStack } from '../lib/forms-nexus-apis-stack';
 
-const cdk = require('aws-cdk-lib');
-const { MessageCenterStack } = require('../lib/message-center-stack');
-
+const STACK_NAME = 'forms-nexus-apis-stack';
 const app = new cdk.App();
-new MessageCenterStack(app, 'MessageCenterStack', {
+
+new FormsNexusApisStack(app, STACK_NAME, {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
 
   /* Uncomment the next line to specialize this stack for the AWS Account
    * and Region that are implied by the current CLI configuration. */
-  // env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION },
+  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION },
+  stackName: STACK_NAME,
 
   /* Uncomment the next line if you know exactly what Account and Region you
    * want to deploy the stack to. */
