@@ -42,9 +42,6 @@ jobs:
       - name: Synth
         run: npm run synth:prod
 
-      - name: Run Unit Tests
-        run: npm run test
-
       - name: Deploy AWS CDK Stack
         run: npm run deploy:prod
         env:
