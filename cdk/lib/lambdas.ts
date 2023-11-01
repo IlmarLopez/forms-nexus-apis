@@ -24,7 +24,7 @@ export class Lambdas extends Construct {
       code: lambda.Code.fromAsset(
         path.join(__dirname, '../../cmd/send-email')
       ),
-      handler: 'boostrap',
+      handler: 'bootstrap',
       timeout: Duration.minutes(2),
       memorySize: 128,
       role: roles.sendEmailRole,
