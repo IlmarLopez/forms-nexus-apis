@@ -1,0 +1,42 @@
+name: AWS Service CI/CD PROD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build and Test AWS CDK Typescript Stack
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+
+      - name: Initiated By User
+        run: echo $GITHUB_ACTOR
+
+      - name: Check Out Code
+        uses: actions/checkout@v3.1.0
+
+      - name: Install Node
+        uses: actions/setup-node@v3.5.0
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Synth
+        run: npm run synth:prod
+
+      - name: Run Unit Tests
+        run: npm run test
+
+      - name: Deploy AWS CDK Stack
+        run: npm run deploy:prod
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-1'
