@@ -8,13 +8,13 @@ export class APIGatewayModule extends Construct {
   private scopeStack: Construct;
   private API: RestApi;
   private config: any;
-  private sendEmailLambda: lambda.Function;
+  private sendEmailLambdaFunction: lambda.Function;
 
-  constructor(scope: Construct, id: string, props: StackProperties, sendEmailLambda: lambda.Function) {
+  constructor(scope: Construct, id: string, props: StackProperties, sendEmailLambdaFunction: lambda.Function) {
     super(scope, id);
     this.scopeStack = scope;
     this.API = this.build(props);
-    this.sendEmailLambda = sendEmailLambda;
+    this.sendEmailLambdaFunction = sendEmailLambdaFunction;
   }
 
   private build(props?: StackProperties): RestApi {
@@ -23,7 +23,7 @@ export class APIGatewayModule extends Construct {
 
     const ID = `${props?.stackName}-forms-nexu-api-${props?.environment}`;
 
-    const sendEmailIntegration = new LambdaIntegration(this.sendEmailLambda);
+    const sendEmailLambdaIntegration = new LambdaIntegration(this.sendEmailLambdaFunction);
 
     let logGroup = new LogGroup(this, 'forms-nexu-api-logs', {
       logGroupName: `${props?.stackName}-forms-nexu-api-gw-${props?.environment}`,
@@ -52,7 +52,7 @@ export class APIGatewayModule extends Construct {
 
     const v1 = api.root.addResource('v1');
 
-    v1.addResource('test').addMethod('GET', sendEmailIntegration, {
+    v1.addResource('test').addMethod('GET', sendEmailLambdaIntegration, {
       apiKeyRequired: false,
     });
 
