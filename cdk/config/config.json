@@ -1,1 +1,16 @@
-{}
+ {
+  "environment": {
+    "dev": {
+      "stage": "dev",
+      "domain": {
+        "name": "api.ilmar.dev"
+      }
+    },
+    "prod": {
+      "stage": "prod",
+      "domain": {
+        "name": "api.ilmarlopez.com"
+      }
+    }
+  }
+}

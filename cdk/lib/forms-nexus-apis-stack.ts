@@ -2,9 +2,10 @@ import { Stack, Tags } from 'aws-cdk-lib'
 import { Construct } from 'constructs';
 import { StackProperties } from './types/StackProperties';
 import { Lambdas } from './lambdas';
+import { APIGatewayModule } from './api-gateway';
 
 import config from '../config/config.json';
-import { APIGatewayModule } from './api-gateway';
+import { Roles } from './roles';
 
 export class FormsNexusApisStack extends Stack {
   private config: any;
@@ -18,7 +19,8 @@ export class FormsNexusApisStack extends Stack {
     this.config = props?.config;
     this.config = this.config[props.environment];
 
-    const lambdas = new Lambdas(this, 'Lambdas', props);
+    const roles = new Roles(this, 'Roles', props);
+    const lambdas = new Lambdas(this, 'Lambdas', props, roles);
 
     new APIGatewayModule(this, 'APIGateway', props, lambdas);
 
