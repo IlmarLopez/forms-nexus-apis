@@ -2,19 +2,19 @@ import { RestApi, CfnMethod, BasePathMapping, DomainName, LogGroupLogDestination
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs'; 
 import {Construct } from 'constructs';
 import { StackProperties } from './types/StackProperties';
-import { Lambdas } from './lambdas';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 
 export class APIGatewayModule extends Construct {
   private scopeStack: Construct;
   private API: RestApi;
   private config: any;
-  private lambdas: Lambdas;
+  private sendEmailLambda: lambda.Function;
 
-  constructor(scope: Construct, id: string, props: StackProperties, lambdas: Lambdas) {
+  constructor(scope: Construct, id: string, props: StackProperties, sendEmailLambda: lambda.Function) {
     super(scope, id);
     this.scopeStack = scope;
     this.API = this.build(props);
-    this.lambdas = lambdas;
+    this.sendEmailLambda = sendEmailLambda;
   }
 
   private build(props?: StackProperties): RestApi {
@@ -23,7 +23,7 @@ export class APIGatewayModule extends Construct {
 
     const ID = `${props?.stackName}-forms-nexu-api-${props?.environment}`;
 
-    const sendEmailIntegration = new LambdaIntegration(this.lambdas.sendEmail);
+    const sendEmailIntegration = new LambdaIntegration(this.sendEmailLambda);
 
     let logGroup = new LogGroup(this, 'forms-nexu-api-logs', {
       logGroupName: `${props?.stackName}-forms-nexu-api-gw-${props?.environment}`,
