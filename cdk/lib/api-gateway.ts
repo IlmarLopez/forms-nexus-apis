@@ -2,15 +2,15 @@ import { RestApi, CfnMethod, BasePathMapping, DomainName, LogGroupLogDestination
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs'; 
 import {Construct } from 'constructs';
 import { StackProperties } from './types/StackProperties';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
+import { Function } from 'aws-cdk-lib/aws-lambda';
 
 export class APIGatewayModule extends Construct {
   private scopeStack: Construct;
   private API: RestApi;
   private config: any;
-  private sendEmailLambdaFunction: lambda.Function;
+  private sendEmailLambdaFunction: Function;
 
-  constructor(scope: Construct, id: string, props: StackProperties, sendEmailLambdaFunction: lambda.Function) {
+  constructor(scope: Construct, id: string, props: StackProperties, sendEmailLambdaFunction: Function) {
     super(scope, id);
     this.scopeStack = scope;
     this.API = this.build(props);

@@ -17,7 +17,7 @@ export class Lambdas extends Construct {
     this.config = props?.config;
     this.config = this.config[props?.environment!];
 
-    this.sendEmail = new lambda.Function(scope, 'send-email-lambda', {
+    this.sendEmail = new lambda.Function(this, 'send-email-lambda', {
       description: '',
       functionName: `${props.stackName}-send-email-${props.environment}`,
       runtime: lambda.Runtime.PROVIDED_AL2,
