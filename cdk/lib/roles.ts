@@ -27,3 +27,5 @@ export class Roles extends Construct {
     );
   }
 }
+
+module.exports = { Roles };
