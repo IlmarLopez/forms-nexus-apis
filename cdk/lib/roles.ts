@@ -27,7 +27,7 @@ export class Roles extends Construct {
       })
     );
 
-    const apiGatewayRequestAuthorizerRole = new Role(this, 'send-email-role', {
+    const apiGatewayRequestAuthorizerRole = new Role(this, 'api-gateway-request-authorizer-role', {
       assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
     });
 
