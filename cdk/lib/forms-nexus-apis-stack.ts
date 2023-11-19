@@ -4,7 +4,7 @@ import { StackProperties } from './types/StackProperties';
 import { Lambdas } from './lambdas';
 import { APIGatewayModule } from './api-gateway';
 
-import config from '../config/config.json';
+import config from './system/config.json';
 import { Roles } from './roles';
 
 export class FormsNexusApisStack extends Stack {
@@ -22,7 +22,7 @@ export class FormsNexusApisStack extends Stack {
     const roles = new Roles(this, 'Roles', props);
     const lambdas = new Lambdas(this, 'Lambdas', props, roles);
 
-    new APIGatewayModule(this, 'APIGateway', props, lambdas.sendEmail);
+    new APIGatewayModule(this, 'APIGateway', props, lambdas);
 
     Tags.of(scope).add('repository', 'forms-nexus-apis');
   }

@@ -10,6 +10,7 @@ const path = require('path');
 export class Lambdas extends Construct {
   private config: any;
   public sendEmail: lambda.Function;
+  public apiGatewayRequestAuthorizer: lambda.Function;
 
   constructor(scope: Construct, id: string, props: StackProperties, roles: Roles) {
     super(scope, id);
@@ -29,6 +30,21 @@ export class Lambdas extends Construct {
       memorySize: 128,
       role: roles.sendEmailRole,
       logRetentionRole: roles.sendEmailRole,
+      logRetention: RetentionDays.ONE_MONTH,
+    });
+
+    this.apiGatewayRequestAuthorizer = new lambda.Function(this, 'api-gateway-request-authorizer', {
+      description: '',
+      functionName: `${props.stackName}-api-gateway-request-authorizer-${props.environment}`,
+      runtime: lambda.Runtime.PROVIDED_AL2,
+      code: lambda.Code.fromAsset(
+        path.join(__dirname, '../../cmd/api-gateway-request-authorizer')
+      ),
+      handler: 'bootstrap',
+      timeout: Duration.minutes(1),
+      memorySize: 128,
+      role: roles.apiGatewayRequestAuthorizerRole,
+      logRetentionRole: roles.apiGatewayRequestAuthorizerRole,
       logRetention: RetentionDays.ONE_MONTH,
     });
   }

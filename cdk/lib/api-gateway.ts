@@ -1,20 +1,27 @@
-import { RestApi, CfnMethod, BasePathMapping, DomainName, LogGroupLogDestination, AccessLogFormat, Cors, LambdaIntegration } from 'aws-cdk-lib/aws-apigateway';
+import { RestApi, CfnMethod, BasePathMapping, DomainName, LogGroupLogDestination, AccessLogFormat, Cors, LambdaIntegration, RequestAuthorizer, IdentitySource } from 'aws-cdk-lib/aws-apigateway';
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs'; 
 import {Construct } from 'constructs';
 import { StackProperties } from './types/StackProperties';
-import { Function } from 'aws-cdk-lib/aws-lambda';
+import { DockerImageFunction, Function } from 'aws-cdk-lib/aws-lambda';
+import { Lambdas } from './lambdas';
+
+export interface ApiGatewayConstructProps {
+  stackProps: StackProperties;
+  name: string;
+  description: string;
+}
 
 export class APIGatewayModule extends Construct {
   private scopeStack: Construct;
   private API: RestApi;
   private config: any;
-  private sendEmailLambdaFunction: Function;
+  private lambdas: Lambdas;
 
-  constructor(scope: Construct, id: string, props: StackProperties, sendEmailLambdaFunction: Function) {
+  constructor(scope: Construct, id: string, props: StackProperties, lambdas: Lambdas) {
     super(scope, id);
     this.scopeStack = scope;
     this.API = this.build(props);
-    this.sendEmailLambdaFunction = sendEmailLambdaFunction;
+    this.lambdas = lambdas;
   }
 
   private build(props?: StackProperties): RestApi {
@@ -23,7 +30,17 @@ export class APIGatewayModule extends Construct {
 
     const ID = `${props?.stackName}-forms-nexu-api-${props?.environment}`;
 
-    const sendEmailLambdaIntegration = new LambdaIntegration(this.sendEmailLambdaFunction);
+    const sendEmailLambdaIntegration = new LambdaIntegration(this.lambdas.sendEmail);
+    const authLambdaFuntion = Function.fromFunctionName(
+      this,
+      'lambda-authorizer',
+      `${props?.stackName}-api-gateway-request-authorizer-${props?.environment}`
+    );
+
+    const lambdaAuthorizer = new RequestAuthorizer(this, 'lambda-authorizer', {
+      handler: authLambdaFuntion,
+      identitySources: [IdentitySource.header("Authorization")]
+    })
 
     let logGroup = new LogGroup(this, 'forms-nexu-api-logs', {
       logGroupName: `${props?.stackName}-forms-nexu-api-gw-${props?.environment}`,
@@ -53,6 +70,7 @@ export class APIGatewayModule extends Construct {
     const v1 = api.root.addResource('v1');
 
     v1.addResource('test').addMethod('GET', sendEmailLambdaIntegration, {
+      authorizer: lambdaAuthorizer,
       apiKeyRequired: false,
     });
 

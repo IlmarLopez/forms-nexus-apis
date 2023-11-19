@@ -5,6 +5,7 @@ import { StackProperties } from './types/StackProperties';
 export class Roles extends Construct {
   private config: any;
   public sendEmailRole: Role;
+  public apiGatewayRequestAuthorizerRole: Role;
 
   constructor(scope: Construct, id: string, props: StackProperties) {
     super(scope, id);
@@ -19,6 +20,20 @@ export class Roles extends Construct {
     sendEmailRole.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'));
 
     sendEmailRole.addToPolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        actions: ['logs:CreateLogGroup', 'logs:CreateLogStream'],
+        resources: ['*'],
+      })
+    );
+
+    const apiGatewayRequestAuthorizerRole = new Role(this, 'send-email-role', {
+      assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
+    });
+
+    apiGatewayRequestAuthorizerRole.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'));
+
+    apiGatewayRequestAuthorizerRole.addToPolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
         actions: ['logs:CreateLogGroup', 'logs:CreateLogStream'],
