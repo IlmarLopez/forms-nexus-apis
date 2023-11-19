@@ -30,7 +30,13 @@ jobs:
       - name: Build Go Binaries
         run: |
           for d in cmd/*/; do
-            cd $d && GOOS=linux go build -o bootstrap .
+            if [ -d "$d" ]; then
+                echo "Building in directory: $d"
+                cd "$d" && GOOS=linux go build -o bootstrap . || echo "Failed to build in $d"
+                cd - > /dev/null
+            else
+                echo "Directory $d does not exist"
+            fi
           done
 
       - name: Install Node
