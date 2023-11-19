@@ -2,8 +2,7 @@ import { RestApi, CfnMethod, BasePathMapping, DomainName, LogGroupLogDestination
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs'; 
 import {Construct } from 'constructs';
 import { StackProperties } from './types/StackProperties';
-import { DockerImageFunction, Function } from 'aws-cdk-lib/aws-lambda';
-import { Lambdas } from './lambdas';
+import { Function } from 'aws-cdk-lib/aws-lambda';
 
 export interface ApiGatewayConstructProps {
   stackProps: StackProperties;
@@ -15,13 +14,13 @@ export class APIGatewayModule extends Construct {
   private scopeStack: Construct;
   private API: RestApi;
   private config: any;
-  private lambdas: Lambdas;
+  private sendEmailLambda: Function;
 
-  constructor(scope: Construct, id: string, props: StackProperties, lambdas: Lambdas) {
+  constructor(scope: Construct, id: string, props: StackProperties, sendEmailLambda: Function) {
     super(scope, id);
     this.scopeStack = scope;
     this.API = this.build(props);
-    this.lambdas = lambdas;
+    this.sendEmailLambda = sendEmailLambda;
   }
 
   private build(props?: StackProperties): RestApi {
@@ -30,7 +29,7 @@ export class APIGatewayModule extends Construct {
 
     const ID = `${props?.stackName}-forms-nexu-api-${props?.environment}`;
 
-    const sendEmailLambdaIntegration = new LambdaIntegration(this.lambdas.sendEmail);
+    const sendEmailLambdaIntegration = new LambdaIntegration(this.sendEmailLambda);
     const authLambdaFuntion = Function.fromFunctionName(
       this,
       'lambda-authorizer',

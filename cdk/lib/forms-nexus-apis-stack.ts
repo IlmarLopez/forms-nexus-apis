@@ -22,7 +22,7 @@ export class FormsNexusApisStack extends Stack {
     const roles = new Roles(this, 'Roles', props);
     const lambdas = new Lambdas(this, 'Lambdas', props, roles);
 
-    new APIGatewayModule(this, 'APIGateway', props, lambdas);
+    new APIGatewayModule(this, 'APIGateway', props, lambdas.sendEmail);
 
     Tags.of(scope).add('repository', 'forms-nexus-apis');
   }
