@@ -49,5 +49,3 @@ export class Lambdas extends Construct {
     });
   }
 }
-
-module.exports = { Lambdas };

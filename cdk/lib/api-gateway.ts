@@ -2,7 +2,7 @@ import { RestApi, CfnMethod, BasePathMapping, DomainName, LogGroupLogDestination
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs'; 
 import {Construct } from 'constructs';
 import { StackProperties } from './types/StackProperties';
-import { Function } from 'aws-cdk-lib/aws-lambda';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 
 export interface ApiGatewayConstructProps {
   stackProps: StackProperties;
@@ -11,16 +11,12 @@ export interface ApiGatewayConstructProps {
 }
 
 export class APIGatewayModule extends Construct {
-  private scopeStack: Construct;
   private API: RestApi;
   private config: any;
-  private sendEmailLambda: Function;
 
-  constructor(scope: Construct, id: string, props: StackProperties, sendEmailLambda: Function) {
+  constructor(scope: Construct, id: string, props: StackProperties) {
     super(scope, id);
-    this.scopeStack = scope;
     this.API = this.build(props);
-    this.sendEmailLambda = sendEmailLambda;
   }
 
   private build(props?: StackProperties): RestApi {
@@ -28,11 +24,13 @@ export class APIGatewayModule extends Construct {
     this.config = this.config[props?.environment!];
 
     const ID = `${props?.stackName}-forms-nexu-api-${props?.environment}`;
+    
+    const sendEmailLambdaFunction = lambda.Function.fromFunctionName(this, 'get-send-email-lambda-function', `${props?.stackName}-send-email-${props?.environment}`);
 
-    const sendEmailLambdaIntegration = new LambdaIntegration(this.sendEmailLambda);
-    const authLambdaFuntion = Function.fromFunctionName(
+    const sendEmailLambdaIntegration = new LambdaIntegration(sendEmailLambdaFunction);
+    const authLambdaFuntion = lambda.Function.fromFunctionName(
       this,
-      'lambda-authorizer',
+      'auth-lambda-funtion',
       `${props?.stackName}-api-gateway-request-authorizer-${props?.environment}`
     );
 
