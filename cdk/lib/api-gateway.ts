@@ -13,16 +13,18 @@ export interface ApiGatewayConstructProps {
 export class APIGatewayModule extends Construct {
   private API: RestApi;
   private config: any;
+  private sendEmailFuntion: lambda.Function;
 
-  constructor(scope: Construct, id: string, props: StackProperties) {
+  constructor(scope: Construct, id: string, props: StackProperties, lambda: lambda.Function) {
     super(scope, id);
     this.API = this.build(props);
+    this.sendEmailFuntion = lambda;
   }
 
   private build(props?: StackProperties): RestApi {
     this.config = props?.config;
     this.config = this.config[props?.environment!];
-
+    console.log('Hola jijiji: ', this.sendEmailFuntion);
     const ID = `${props?.stackName}-forms-nexu-api-${props?.environment}`;
     
     const sendEmailLambdaFunction = lambda.Function.fromFunctionName(this, 'get-send-email-lambda-function', `${props?.stackName}-send-email-${props?.environment}`);
