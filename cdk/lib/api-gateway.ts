@@ -4,32 +4,24 @@ import {Construct } from 'constructs';
 import { StackProperties } from './types/StackProperties';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 
-export interface ApiGatewayConstructProps {
-  stackProps: StackProperties;
-  name: string;
-  description: string;
-}
-
 export class APIGatewayModule extends Construct {
   private API: RestApi;
   private config: any;
   private sendEmailFuntion: lambda.Function;
 
-  constructor(scope: Construct, id: string, props: StackProperties, lambda: lambda.Function) {
+  constructor(scope: Construct, id: string, props: StackProperties, sendEmailFuntion: lambda.Function) {
     super(scope, id);
+    this.sendEmailFuntion = sendEmailFuntion;
     this.API = this.build(props);
-    this.sendEmailFuntion = lambda;
   }
 
+  
   private build(props?: StackProperties): RestApi {
     this.config = props?.config;
     this.config = this.config[props?.environment!];
-    console.log('Hola jijiji: ', this.sendEmailFuntion);
     const ID = `${props?.stackName}-forms-nexu-api-${props?.environment}`;
     
-    const sendEmailLambdaFunction = lambda.Function.fromFunctionName(this, 'get-send-email-lambda-function', `${props?.stackName}-send-email-${props?.environment}`);
-
-    const sendEmailLambdaIntegration = new LambdaIntegration(sendEmailLambdaFunction);
+    const sendEmailLambdaIntegration = new LambdaIntegration(this.sendEmailFuntion);
     const authLambdaFuntion = lambda.Function.fromFunctionName(
       this,
       'auth-lambda-funtion',
