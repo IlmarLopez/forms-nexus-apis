@@ -1,4 +1,4 @@
-import { RestApi, CfnMethod, BasePathMapping, DomainName, LogGroupLogDestination, AccessLogFormat, Cors, LambdaIntegration, RequestAuthorizer, IdentitySource } from 'aws-cdk-lib/aws-apigateway';
+import { RestApi, CfnMethod, BasePathMapping, DomainName, LogGroupLogDestination, AccessLogFormat, Cors, LambdaIntegration, RequestAuthorizer, IdentitySource, CfnAccount } from 'aws-cdk-lib/aws-apigateway';
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs'; 
 import {Construct } from 'constructs';
 import { StackProperties } from './types/StackProperties';
@@ -20,8 +20,9 @@ export class APIGatewayModule extends Construct {
     this.config = props?.config;
     this.config = this.config[props?.environment!];
     const ID = `${props?.stackName}-forms-nexu-api-${props?.environment}`;
-    
+
     const sendEmailLambdaIntegration = new LambdaIntegration(this.sendEmailFuntion);
+
     const authLambdaFuntion = lambda.Function.fromFunctionName(
       this,
       'auth-lambda-funtion',
@@ -43,6 +44,7 @@ export class APIGatewayModule extends Construct {
         stageName: this.config.stage,
         accessLogDestination: new LogGroupLogDestination(logGroup),
         accessLogFormat: AccessLogFormat.jsonWithStandardFields(),
+        dataTraceEnabled: true,
       },
       defaultCorsPreflightOptions: {
         allowOrigins: Cors.ALL_ORIGINS,
@@ -57,6 +59,14 @@ export class APIGatewayModule extends Construct {
       },
       deploy: true,
     });
+
+    const cloudWatchRoleArn = 'arn:aws:iam::265993455059:role/cloudWatchlog';
+
+    const apiAccount = new CfnAccount(this, 'api-account', {
+      cloudWatchRoleArn: cloudWatchRoleArn,
+    });
+
+    api.node.addDependency(apiAccount);
 
     const v1 = api.root.addResource('v1');
 
@@ -76,6 +86,8 @@ export class APIGatewayModule extends Construct {
       cfnMethod.addPropertyDeletionOverride('AuthorizerId');
     });
 
+    console.log(this.config.domain.name);
+    
     const domainName = DomainName.fromDomainNameAttributes(this, 'domain-name-forms-nexus', {
       domainName: this.config.domain.name,
       domainNameAliasHostedZoneId: '',

@@ -40,6 +40,7 @@ export class Roles extends Construct {
         resources: ['*'],
       })
     );
+
   }
 }
 

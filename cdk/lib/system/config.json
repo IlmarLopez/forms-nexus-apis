@@ -4,14 +4,14 @@
       "stage": "dev",
       "region": "us-west-2",
       "domain": {
-        "name": "api.ilmar.dev"
+        "name": "api.formsnexus.dev"
       }
     },
     "prod": {
       "stage": "prod",
       "region": "us-east-1",
       "domain": {
-        "name": "api.ilmarlopez.com"
+        "name": "api.formsnexus.com"
       }
     }
   }
